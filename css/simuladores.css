@@ -1,0 +1,490 @@
+/* Estilos base dos simuladores gerais */
+.sim-container { background: #1e293b; border-radius: 8px; padding: 1.5rem; text-align: center; color: white; margin: 1.5rem 0; }
+canvas { background: #000; border-radius: 4px; max-width: 100%; }
+
+.controls { margin-top: 1rem; display: flex; justify-content: center; gap: 20px; align-items: center; flex-wrap: wrap; }
+.control-group { display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 8px; }
+.control-group input { width: 150px; cursor: pointer; }
+
+.action-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+.action-buttons button { background: #3b82f6; padding: 0.5rem 1rem; font-size: 0.9rem; border-radius: 4px; border: none; color: white; cursor: pointer; font-weight: bold; }
+.action-buttons button:hover { filter: brightness(1.1); }
+.action-buttons button.stop { background: #ef4444; }
+.action-buttons button.reset { background: #64748b; }
+
+.sim-viewport { display: flex; align-items: center; justify-content: space-between; background: #0b1120; padding: 15px; border-radius: 8px; gap: 10px; flex-wrap: wrap; }
+.sim-box { border: 2px solid #334155; border-radius: 6px; position: relative; width: 35%; height: 200px; flex: 1 1 200px; }
+.sim-box canvas { width: 100%; height: 100%; object-fit: cover; }
+.sim-label { position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+
+.wave-container { width: 20%; height: 80px; position: relative; flex: 1 1 100px;}
+#wave-arrows { width: 100%; height: 100%; }
+.heat-arrow { transition: fill 0.3s; }
+.flow-text { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; font-weight: bold; z-index: 10; pointer-events: none; }
+#flow-text-top { top: -8px; font-size: 0.9rem; }
+#flow-text-bottom { bottom: -8px; font-size: 0.75rem; }
+
+.energy-sim-grid { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; margin-top: 20px; }
+.energy-panel { background: #0f172a; padding: 15px; border-radius: 8px; flex: 1 1 250px; display: flex; flex-direction: column; }
+.energy-slider-group { margin-top: 10px; text-align: left; }
+.energy-slider-group label { font-size: 0.9rem; color: #e2e8f0; display: flex; justify-content: space-between; }
+.energy-slider-group input { width: 100%; cursor: pointer; margin-top: 5px; }
+
+.energy-bar-container { background: #334155; height: 22px; border-radius: 10px; overflow: hidden; margin-top: 5px; border: 1px solid #475569; position: relative; }
+.energy-bar { height: 100%; transition: width 0.2s, background-color 0.2s; }
+.energy-val { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); pointer-events: none; }
+
+.scale-box { display: flex; justify-content: space-around; align-items: flex-end; height: 300px; padding: 20px; }
+
+/* Garante que o termômetro seja a base para as marcas */
+.sim-container {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    text-align: center;
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.scale-box {
+    display: flex;
+    justify-content: center;
+    gap: 80px; /* Espaço entre os termômetros */
+    padding-top: 20px;
+    padding-left: 40px; /* Compensa o espaço das marcas à esquerda */}
+
+.thermometer {
+    width: 28px;
+    height: 200px;
+    background-color: #e2e8f0; 
+    border: 2px solid #94a3b8;
+    border-radius: 20px;
+    position: relative; /* Necessário para ancorar as marcas e rótulos */
+    display: flex;
+    align-items: flex-end;
+}
+.mercury {
+    width: 100%;
+    background-color: #ef4444; 
+    transition: height 0.3s ease;
+    border-radius: 20px;
+}
+.markers {
+    position: absolute;
+    left: -75px; 
+    height: 100%;
+    width: 70px;
+    pointer-events: none;
+z-index: 10;
+}
+.mark {
+    position: absolute;
+    width: 100%;
+    text-align: right;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #64748b;
+    transform: translateY(50%);
+}
+.label {
+    position: absolute;
+    bottom: -35px; /* Empurra a letra bem para baixo do tubo */
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #1e293b;
+}
+.controls input {
+    padding: 12px;
+    width: 90px;
+    border-radius: 6px;
+    border: 1px solid #94a3b8;
+    font-size: 1rem;
+}
+
+.result-text {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #0f172a;
+}
+/* --- ESTILOS DO SIMULADOR TERMODINÂMICO --- */
+.experimento-container {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    background: radial-gradient(circle at center, #1e293b, #020617);
+    border-radius: 12px;
+    border: 2px solid #334155;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px; /* Aumentado para baixar o frasco na tela */
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+    margin-bottom: 2rem;
+}
+
+.becker {
+    position: relative;
+    width: 180px;
+    height: 220px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: none;
+    border-radius: 0 0 20px 20px;
+    box-shadow: inset 0 0 25px rgba(255,255,255,0.1), 0 10px 20px rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    z-index: 10;
+    margin-top: 30px; /* Baixa o conjunto frasco+termómetro */
+}
+.becker::before { 
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -15px;
+    width: 210px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+}
+
+.agua {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 180px; 
+    background: rgba(56, 189, 248, 0.3);
+    border-radius: 0 0 17px 17px;
+    transition: background-color 0.5s ease;
+    overflow: hidden; /* Mantém o gelo dentro da água */
+}
+
+.bolhas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.5s;
+    background-image: radial-gradient(circle, white 20%, transparent 20%);
+    background-size: 15px 15px;
+    animation: ferver 0.5s infinite linear;
+}
+
+@keyframes ferver {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -15px; }
+}
+
+.thermo-3d {
+    position: absolute;
+    top: -30px;
+    width: 30px;
+    height: 230px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.5));
+    z-index: 20;
+}
+.vidro-tubo {
+    width: 14px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 7px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 2px 0 5px rgba(255,255,255,0.2), inset -2px 0 5px rgba(0,0,0,0.3);
+}
+.liquido-interno {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 20%; 
+    background: linear-gradient(to right, #b91c1c, #ef4444 40%, #dc2626 60%, #991b1b);
+    transition: height 0.1s linear, background-color 0.5s ease;
+}
+.vidro-brilho {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 3px;
+    height: 98%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+    border-radius: 2px;
+}
+.vidro-bulbo {
+    width: 36px;
+    height: 36px;
+    background: radial-gradient(circle at 10px 10px, #ef4444, #b91c1c 60%, #450a0a);
+    border-radius: 50%;
+    margin-top: -10px;
+    position: relative;
+    box-shadow: inset -3px -3px 7px rgba(0,0,0,0.6), 0 3px 5px rgba(0,0,0,0.3);
+    transition: background-color 0.5s ease;
+}
+
+/* NOVA CHAMA CINTILANTE */
+.chama-container {
+    position: absolute;
+    bottom: -55px; /* Fica logo abaixo do frasco */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 65px;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.chama-out {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 65px;
+    background: #ea580c; /* Laranja escuro */
+    border-radius: 50% 50% 20% 20%;
+    filter: blur(4px);
+    animation: cintilar-out 0.1s infinite alternate;
+}
+.chama-core {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 45px;
+    background: #fef08a; /* Amarelo claro */
+    border-radius: 50% 50% 20% 20%;
+    filter: blur(2px);
+    animation: cintilar-core 0.08s infinite alternate;
+}
+
+@keyframes cintilar-out {
+    0% { transform: translateX(-50%) scale(0.9) skewX(-2deg); }
+    100% { transform: translateX(-50%) scale(1.1) skewX(2deg); }
+}
+@keyframes cintilar-core {
+    0% { transform: translateX(-50%) scale(0.95); }
+    100% { transform: translateX(-50%) scale(1.05); }
+}
+
+/* NOVO COMPORTAMENTO DO GELO */
+.gelo-cubo {
+    position: absolute;
+    bottom: 5px; /* Vai para o fundo do frasco */
+    width: 35px;
+    height: 35px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px solid rgba(255,255,255,0.9);
+    border-radius: 8px;
+    opacity: 0;
+    box-shadow: inset 0 0 10px rgba(255,255,255,1);
+    z-index: 15;
+    transform: translateY(-200px); /* Inicia invisível no alto */
+    transition: opacity 0.3s, transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.painel-controles {
+    margin-top: auto;
+    width: 100%;
+    background: rgba(15, 23, 42, 0.9);
+    padding: 15px;
+    border-top: 1px solid #334155;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    align-items: center;
+    z-index: 30;
+    flex-wrap: wrap;
+}
+.info-display {
+    background: #000;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    color: white;
+    font-family: monospace;
+    text-align: center;
+    min-width: 180px;
+}
+.info-display strong { font-size: 1.5rem; color: var(--accent); }
+.btn-exp {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-exp:hover { transform: translateY(-2px); filter: brightness(1.1); }
+.btn-exp:active { transform: translateY(0); }
+
+.btn-fogo { background-color: #dc2626; color: white; }
+.btn-gelo { background-color: #38bdf8; color: #0f172a; }
+.btn-parar { background-color: #64748b; color: white; }
+
+/* --- ESTILOS DO FORNO E TERMÔMETRO BIMETÁLICO --- */
+/* --- ESTILOS DO FORNO INDUSTRIAL (V6 - DILATAÇÃO DA ESPIRAL) --- */
+.forno-industrial { background: #1e293b; padding: 40px; border-radius: 20px; color: white !important; margin: 20px 0; }
+.titulo-simulador { color: #f8fafc; text-align: center; margin-bottom: 25px; }
+.forno-layout { display: flex; gap: 30px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+
+.camara-forno { 
+    width: 380px; height: 380px; background: #0f172a; border: 12px solid #334155; 
+    border-radius: 15px; position: relative; display: flex; flex-direction: column; 
+    align-items: center; justify-content: flex-start; padding-top: 40px;
+}
+
+.label-tech { position: absolute; top: 10px; color: #475569; font-size: 0.65rem; font-weight: bold; letter-spacing: 2px; }
+
+/* RELÓGIO DO TERMÓMETRO */
+.termometro-corpo { background: #f1f5f9; padding: 10px; border-radius: 50%; border: 6px solid #94a3b8; z-index: 5; }
+.mostrador-analogo { width: 150px; height: 150px; position: relative; }
+
+/* NÚMEROS (Preto absoluto sobre fundo claro) */
+.marcador { position: absolute; color: #000 !important; font-weight: 900; font-size: 0.8rem; z-index: 10; }
+.m0   { bottom: 25px; left: 10px; }
+.m100 { top: 15px; left: 25px; }
+.m200 { top: 15px; right: 25px; }
+.m300 { bottom: 25px; right: 10px; }
+
+.ponteiro-red { 
+    width: 3px; height: 65px; background: #ef4444; position: absolute; 
+    bottom: 50%; left: 50%; transform-origin: bottom center; 
+    transform: translateX(-50%) rotate(-120deg); z-index: 11;
+}
+
+/* ESPIRAL MECÂNICA (V6 - AJUSTE DE TRANSFORMAÇÃO) */
+.espiral-mecanica { 
+    position: absolute; 
+    top: 15%; 
+    left: 15%; 
+    width: 70%; 
+    height: 70%; 
+    z-index: 9;
+    /* ADICIONADO: Garante que a espiral roda no seu próprio centro */
+    transform-origin: center center; 
+    /* ADICIONADO: Torna o movimento de dilatação visível e suave */
+    transition: transform 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67); 
+}
+
+/* RESISTÊNCIAS NO FUNDO */
+.resistencias-box { position: absolute; bottom: 30px; width: 70%; display: flex; flex-direction: column; gap: 8px; }
+.resistencia-filamento { height: 5px; background: #1e293b; border-radius: 5px; border: 1px solid #334155; transition: 0.5s; }
+
+/* PAINEL E BOTÃO */
+.painel-operacional { display: flex; flex-direction: column; gap: 15px; min-width: 200px; }
+.visor-digital-led { background: #000; border: 2px solid #334155; padding: 15px; border-radius: 10px; text-align: center; }
+.valor-led { color: #4ade80; font-family: monospace; font-size: 1.8rem; }
+
+.btn-power { 
+    background: linear-gradient(180deg, #22c55e, #16a34a); color: white; border: none; padding: 18px; border-radius: 8px; 
+    font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px #065f46;
+}
+.btn-power:active { transform: translateY(3px); box-shadow: 0 2px #065f46; }
+.btn-power.off { background: linear-gradient(180deg, #ef4444, #b91c1c); box-shadow: 0 4px #7f1d1d; }
+
+/* =======================================================
+   SIMULADOR 3: TERMÓMETRO ÓPTICO (CSS COMPLETO)
+======================================================== */
+.termometro-optico-sim { 
+    background: #1e293b; padding: 40px; border-radius: 20px; 
+    color: white !important; margin: 40px 0; box-shadow: inset 0 0 50px rgba(0,0,0,0.5); 
+}
+
+.optico-layout { 
+    display: flex; justify-content: space-between; align-items: center; 
+    background: #0f172a; padding: 40px; border-radius: 15px; 
+    border: 4px solid #334155; position: relative; overflow: hidden; 
+}
+
+/* BLOCO E MAÇARICO */
+.area-emissor { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10; width: 140px; }
+.bloco-metal { width: 80px; height: 120px; background: #94a3b8; border-radius: 5px; border: 2px solid #475569; transition: all 0.3s ease; }
+.chama-queimador { 
+    width: 50px; height: 0px; background: linear-gradient(to top, #3b82f6, #60a5fa, transparent); 
+    border-radius: 50% 50% 0 0; transition: height 0.5s ease; position: absolute; 
+    bottom: 10px; filter: blur(3px); z-index: -1; 
+}
+.chama-queimador.ativa { height: 60px; bottom: -30px; }
+.label-obj { color: #64748b; font-size: 0.65rem; font-weight: bold; margin-top: 15px; text-align: center; }
+
+/* ONDAS E ANIMAÇÃO (A animação estava a faltar!) */
+.area-ondas { flex-grow: 1; height: 150px; margin: 0 20px; display: flex; align-items: center; }
+.svg-ondas { width: 100%; height: 100%; }
+.onda { 
+    fill: none; stroke: #ef4444; stroke-width: 2; stroke-dasharray: 15 10; 
+    opacity: 0; /* Ficam invisíveis até o JS mandar aparecer */
+    animation: moverOnda 4s linear infinite; 
+    transition: opacity 0.5s, stroke-width 0.5s, stroke 0.5s;
+}
+
+/* O motor que faz as ondas andarem */
+@keyframes moverOnda { 
+    from { stroke-dashoffset: 60; } 
+    to { stroke-dashoffset: 0; } 
+}
+
+/* TERMÓMETRO ÓPTICO (O sensor que tinha desaparecido) */
+.area-receptor { position: relative; z-index: 10; width: 180px; }
+.sensor-optico { display: flex; align-items: center; }
+.lente-sensor { 
+    width: 20px; height: 60px; background: #38bdf8; border-radius: 10px 0 0 10px; 
+    border: 2px solid #0284c7; border-right: none; box-shadow: inset -5px 0 10px rgba(0,0,0,0.5); 
+}
+.corpo-sensor { 
+    background: #334155; padding: 20px; border-radius: 0 10px 10px 0; 
+    border: 2px solid #475569; border-left: none; box-shadow: 5px 5px 15px rgba(0,0,0,0.5); 
+    display: flex; flex-direction: column; align-items: center;
+}
+.nome-aparelho { color: #94a3b8; font-size: 0.65rem; font-weight: bold; margin-bottom: 10px; text-align: center; letter-spacing: 1px; }
+.visor-sensor { background: #000; color: #facc15; font-family: monospace; font-size: 1.5rem; padding: 10px; border-radius: 5px; border: 1px solid #1e293b; text-align: center; min-width: 120px; }
+
+.btn-cool {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 5px;
+}
+
+.btn-reset {
+    background-color: #64748b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 5px;
+}
+
+.btn-cool:hover { background-color: #1d4ed8; }
+.btn-reset:hover { background-color: #475569; }
+/* Esta regra afetará APENAS o simulador de fluxo de calor */
+#fluxo-calor-root {
+    background-color: #0f172a !important; /* Azul escuro original */
+    border: 1px solid #1e293b;           /* Borda sutil para dar acabamento */
+    border-radius: 12px;                 /* Arredondamento das bordas */
+    padding: 20px;
+}
+
+/* Garante que o texto de descrição não fique "apagado" no fundo escuro */
+#fluxo-calor-root p {
+    color: #94a3b8 !important; 
+}

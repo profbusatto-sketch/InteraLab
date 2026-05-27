@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InteraLab - Laboratório Virtual de Física</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/simuladores.css">
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-box">
+        <h1 style="font-size: 2.5rem; color: var(--accent); margin-bottom: 5px;">InteraLab</h1>
+        <p style="color: #64748b; margin-bottom: 30px;">Laboratório Virtual de Física</p>
+        
+        <div class="input-group">
+            <label for="userName">O seu Nome completo</label>
+            <input type="text" id="userName" placeholder="Ex: João Silva" required>
+        </div>
+        
+        <div class="input-group">
+            <label for="userRole">Tipo de Perfil</label>
+            <select id="userRole">
+                <option value="aluno">Sou Aluno(a)</option>
+                <option value="professor">Sou Professor(a)</option>
+            </select>
+        </div>
+        
+        <button class="btn-login" onclick="doLogin()">Acessar a Plataforma</button>
+        <p style="font-size: 0.8rem; margin-top: 15px; color: #94a3b8;">Protótipo de autenticação local.</p>
+    </div>
+</div>
+
+<div id="main-app">
+
+    <nav class="main-nav">
+        <div class="brand" onclick="showSection('dashboard')">InteraLab</div>
+        <div class="nav-links">
+            <a onclick="showSection('dashboard')">Áreas da Física</a>
+            <a id="nav-teacher" onclick="showSection('professor')" style="display: none;">Painel Professor</a>
+            <span class="user-info">👤 <span id="display-username">Usuário</span></span>
+            <a class="logout-btn" onclick="doLogout()">Sair</a>
+        </div>
+    </nav>
+
+    <nav id="termo-nav" class="sub-nav">
+        <a id="nav-mod1" onclick="showSection('modulo1')">1. Temperatura, Calor e Energia</a>
+        <a id="nav-mod2" onclick="showSection('modulo2')">2. Escalas e Zero Absoluto</a>
+    </nav>
+
+    <div class="container">
+
+        <section id="dashboard" class="active">
+            <div class="dashboard-header">
+                <h1 id="welcome-msg">Bem-vindo ao InteraLab</h1>
+                <p>O seu Laboratório Virtual. Escolha uma área abaixo para começar a interagir.</p>
+            </div>
+
+            <div class="grid-areas">
+                <div class="card-area active-area" onclick="showSection('modulo1')">
+                    <h3>Termologia</h3>
+                    <p>Estudo do calor, temperatura, escalas termométricas e comportamento térmico dos corpos.</p>
+                    <span class="badge">Módulo Disponível</span>
+                </div>
+                
+                <div class="card-area" onclick="alert('O módulo de Cinemática será adicionado em breve!')">
+                    <h3>Cinemática</h3>
+                    <p>Estudo do movimento dos corpos, velocidade, aceleração e trajetórias.</p>
+                    <span class="badge">Em Breve</span>
+                </div>
+
+                <div class="card-area" onclick="alert('O módulo de Dinâmica será adicionado em breve!')">
+                    <h3>Dinâmica</h3>
+                    <p>Estudo das causas do movimento, as Leis de Newton, forças e atrito.</p>
+                    <span class="badge">Em Breve</span>
+                </div>
+
+                <div class="card-area" onclick="alert('O módulo de Hidrostática será adicionado em breve!')">
+                    <h3>Hidrostática</h3>
+                    <p>Comportamento dos fluidos em repouso, pressão, impulsão e Princípio de Arquimedes.</p>
+                    <span class="badge">Em Breve</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="modulo1">
+            <h2>1. Temperatura e Equilíbrio Térmico</h2>
+            
+            <p>Para a Física, a <strong>temperatura</strong> é uma grandeza física que está relacionada ao grau de agitação das partículas (átomos ou moléculas) de um sistema em equilíbrio térmico. Em termos microscópicos, ela está associada à energia cinética média dessas partículas.</p>
+            <p>Isso significa que, num recipiente contendo água a uma temperatura mais elevada, as moléculas apresentam maior energia cinética média e movimentam-se de forma mais intensa. Numa amostra com menor temperatura, as moléculas apresentam menor grau de agitação. </p>
+            
+            <div class="story-box">
+                <strong>O Café com Leite:</strong> Imagine que tem uma xícara de café a 70 °C e adiciona leite a 5 °C. Ao interagir, ocorre uma troca de energia em trânsito (calor) do mais quente para o mais frio, até que a mistura atinja uma temperatura intermediária. Nesse momento, dizemos que os dois sistemas atingiram o <strong>equilíbrio térmico</strong>.
+            </div>
+<!-- simulador Fluxo de calor -------------------Início------------------------------ -->
+            <div class="sim-container" id="fluxo-calor-root">
+                <h3 style="color: var(--accent);">Simulador 1: Fluxo de Calor e Equilíbrio</h3>
+                <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 15px;">Ajuste as temperaturas e clique em "Iniciar" para observar a energia a fluir até ao equilíbrio térmico.</p>
+                
+                <div class="sim-viewport">
+                    <div class="sim-box">
+                        <div class="sim-label" style="color: #ef4444;">Sistema A</div>
+                        <canvas id="canvasA" width="250" height="200"></canvas>
+                    </div>
+                    <div class="wave-container">
+                        <div id="flow-text-top" class="flow-text"></div>
+                        <svg id="wave-arrows" viewBox="0 0 100 50" preserveAspectRatio="none">
+                            <polygon class="heat-arrow" points="" />
+                            <polygon class="heat-arrow" points="" />
+                            <polygon class="heat-arrow" points="" />
+                            <polygon class="heat-arrow" points="" />
+                            <polygon class="heat-arrow" points="" />
+                            <polygon class="heat-arrow" points="" />
+                        </svg>
+                        <div id="flow-text-bottom" class="flow-text"></div>
+                    </div>
+                    <div class="sim-box">
+                        <div class="sim-label" style="color: #3b82f6;">Sistema B</div>
+                        <canvas id="canvasB" width="250" height="200"></canvas>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Temperatura A: <strong id="val-a">70</strong> °C</label>
+                        <input type="range" id="range-a" min="0" max="100" value="70" oninput="updateSlidersManually()">
+                    </div>
+                    <div class="control-group">
+                        <label>Temperatura B: <strong id="val-b">10</strong> °C</label>
+                        <input type="range" id="range-b" min="0" max="100" value="10" oninput="updateSlidersManually()">
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button onclick="startSim()">▶ Iniciar</button>
+                    <button class="stop" onclick="pauseSim()">⏸ Parar</button>
+                    <button class="reset" onclick="resetSim()">↻ Reiniciar</button>
+                </div>
+            </div>
+<!-- simulador Fluxo de calor -------------------Início------------------------------ -->
+            <div class="quiz-container">
+                <h3>Questionário 1 (Equilíbrio Térmico)</h3>
+                <div class="question">
+                    <p><strong>Questão 1:</strong> Aumente a temperatura do sistema A para 90 °C e do sistema B para 20 °C. O que há de diferente no movimento das moléculas dos dois sistemas? Como isso pode ser associado ao conceito de temperatura?</p>
+                    <textarea id="q1_m1_ans" rows="3"></textarea>
+                </div>
+                <div class="question">
+                    <p><strong>Questão 2:</strong> Com a temperatura do sistema A em 90 °C e a do B em 20 °C, clique em "Iniciar". Observe o que acontece com a agitação das moléculas em cada um dos sistemas. O que aconteceu com a agitação no sistema A e no sistema B ao longo do tempo?</p>
+                    <textarea id="q2_m1_ans" rows="3"></textarea>
+                </div>
+                <div class="question">
+                    <p><strong>Questão 3:</strong> Quando existe fluxo de energia (calor) e quando ele deixa de existir?</p>
+                    <textarea id="q3_m1_ans" rows="2"></textarea>
+                </div>
+                <div class="question">
+                    <p><strong>Questão 4:</strong> Dois sistemas podem ter temperatura, mas apresentar ausência de calor? Explique a diferença entre esses dois conceitos.</p>
+                    <textarea id="q4_m1_ans" rows="3"></textarea>
+                </div>
+                <button class="quiz-btn" onclick="saveAnswersMod1()">Salvar Respostas do Questionário 1</button>
+                <p id="msg_modulo1" class="status-msg">Respostas do Questionário 1 salvas!</p>
+            </div>
+
+            <div class="summary-box">
+                <h3>Resumo dos Conceitos</h3>
+                <ul>
+                    <li><strong>Temperatura:</strong> É a grandeza física relacionada ao grau de agitação das partículas de um sistema (sua energia cinética média). As principais unidades são graus Celsius (°C), Fahrenheit (°F) e kelvin (K).</li>
+                    <li><strong>Calor:</strong> É a energia em trânsito que flui de um corpo para outro devido à diferença de temperatura. Medido em joules (J), calorias (cal) ou quilocalorias (kcal).</li>
+                    <li><strong>Equilíbrio Térmico:</strong> Ocorre quando dois ou mais sistemas atingem a mesma temperatura. <strong>Não há fluxo de calor entre eles</strong>, pois a agitação térmica das partículas igualou-se.</li>
+                </ul>
+            </div>
+
+            <div class="energy-box">
+                <h3>E a Energia Térmica?</h3>
+                <p>Muitas vezes confundida com calor ou temperatura, a <strong>energia térmica</strong> é a soma total da energia cinética (movimento) de todas as partículas de um corpo. Diferente da temperatura (que é apenas a <em>média</em> da agitação), a energia térmica <strong>depende diretamente da massa do corpo</strong> (quantidade de partículas).</p>
+                <p><strong>Exemplo Prático:</strong> Imagine uma xícara de chá a 90 °C e a água de um oceano inteiro a 20 °C. O chá tem uma temperatura maior. No entanto, o oceano tem uma <strong>energia térmica colossalmente maior</strong> que a chávena, porque possui uma quantidade gigantesca de moléculas em movimento.</p>
+            </div>
+
+            <div class="sim-container" style="background: #1e293b;">
+                <h3 style="color: #f59e0b;">Simulador 2: Temperatura vs. Energia Térmica</h3>
+                <p style="font-size: 0.9rem; color: #cbd5e1;">Ajuste a temperatura e a massa. Descubra como um corpo mais frio pode ter mais energia térmica total do que um corpo muito quente!</p>
+                
+                <div class="energy-sim-grid">
+                    <div class="energy-panel">
+                        <h4 style="color: #ef4444; margin-bottom: 10px;">Sistema 1</h4>
+                        <canvas id="canvasEnergy1" width="300" height="150" style="border: 1px solid #334155; border-radius: 4px;"></canvas>
+                        <div class="energy-slider-group">
+                            <label>Temperatura (Agitação): <span id="lbl-t1">90</span> °C</label>
+                            <input type="range" id="range-t1" min="0" max="100" value="90">
+                        </div>
+                        <div class="energy-slider-group">
+                            <label>Massa (Qtd. de Partículas): <span id="lbl-m1">15</span></label>
+                            <input type="range" id="range-m1" min="5" max="200" value="15">
+                        </div>
+                        <div class="energy-slider-group" style="margin-top: 15px;">
+                            <label style="color: #f59e0b; font-weight: bold;">Energia Térmica Total:</label>
+                            <div class="energy-bar-container">
+                                <div id="bar-e1" class="energy-bar" style="background: #ef4444; width: 0%;"></div>
+                                <div id="text-e1" class="energy-val">0 J</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="energy-panel">
+                        <h4 style="color: #3b82f6; margin-bottom: 10px;">Sistema 2</h4>
+                        <canvas id="canvasEnergy2" width="300" height="150" style="border: 1px solid #334155; border-radius: 4px;"></canvas>
+                        <div class="energy-slider-group">
+                            <label>Temperatura (Agitação): <span id="lbl-t2">20</span> °C</label>
+                            <input type="range" id="range-t2" min="0" max="100" value="20">
+                        </div>
+                        <div class="energy-slider-group">
+                            <label>Massa (Qtd. de Partículas): <span id="lbl-m2">150</span></label>
+                            <input type="range" id="range-m2" min="5" max="200" value="150">
+                        </div>
+                        <div class="energy-slider-group" style="margin-top: 15px;">
+                            <label style="color: #f59e0b; font-weight: bold;">Energia Térmica Total:</label>
+                            <div class="energy-bar-container">
+                                <div id="bar-e2" class="energy-bar" style="background: #3b82f6; width: 0%;"></div>
+                                <div id="text-e2" class="energy-val">0 J</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quiz-container">
+                <h3>Questionário 2 (Energia Térmica)</h3>
+                <div class="question">
+                    <p><strong>Questão 1:</strong> No 'Sistema 1', adicione 150 partículas a 20 °C. No 'Sistema 2', adicione 30 partículas a 100 °C. Verifique se os sistemas possuem a mesma quantidade de energia térmica. Comente a relação entre temperatura, quantidade de partículas e energia térmica total com base nesse experimento.</p>
+                    <textarea id="q1_m1_sim2_ans" rows="3"></textarea>
+                </div>
+                <div class="question">
+                    <p><strong>Questão 2:</strong> Dois corpos constituídos pelo mesmo material e com massas idênticas, porém a temperaturas diferentes, possuem a mesma energia térmica? Explique.</p>
+                    <textarea id="q2_m1_sim2_ans" rows="3"></textarea>
+                </div>
+                <div class="question">
+                    <p><strong>Questão 3:</strong> É possível que um sistema com temperatura menor possua mais energia térmica do que outro sistema que esteja a uma temperatura maior?</p>
+                    <textarea id="q3_m1_sim2_ans" rows="3"></textarea>
+                </div>
+                <button class="quiz-btn" onclick="saveAnswersMod1Sim2()">Salvar Respostas do Questionário 2</button>
+                <p id="msg_modulo1_sim2" class="status-msg">Respostas do Questionário 2 salvas!</p>
+            </div>
+        </section>
+
+        <section id="modulo2">
+            <h2>2. Medição, Escalas Termométricas e o Zero Absoluto</h2>
+            
+            <div class="story-box">
+                <strong>Como medimos o invisível?</strong> Como não podemos olhar para um átomo e medir a sua velocidade com uma régua, usamos métodos indiretos para medir a temperatura através de instrumentos chamados <strong>termômetros</strong>.
+            </div>
+
+            <h3>Instrumentos de Medição</h3>
+            <p>	Os termômetros funcionam baseados em alguma propriedade física que muda com a temperatura (chamada de grandeza termométrica), como o volume de um líquido ou a intensidade de ondas. Abaixo será apresentado alguns modelos atuais de termômetros e também a origem das principais escalas termométricas utilizadas atualmente  (Celsius, Fahrenheit e Kelvin).</p>
+                     
+ <div class="instrument-item">
+                <img src="imagens/termometros de liquidos.jpg" alt="Termômetro de Líquidos">
+                <div>
+                    <strong>Termômetro de Dilatação de Líquidos (Mercúrio ou Álcool):</strong> O líquido dentro de um tubo capilar de vidro expande-se ao ser aquecido e sobe pela haste. A variação da altura da coluna de líquido indica a mudança de temperatura.
+                </div>
+            </div>
+
+<p>	No simulador é possível verificar que o líquido do interior do termômetro sofre variações ao aquecer e resfriar o líquido do recipiente. Observe também que o líquido encontra-se tudo (líquido do recipiente, do termômetro e a temperatura ambiente) em equilíbrio térmico. Ligue o fogo e adicione gelo no recipiente para observar as alterações sofridas pelo sistema. </p>
+
+            <div class="experimento-container">
+                <h4 style="color: #cbd5e1; position: absolute; top: 15px; left: 20px; z-index: 30; margin: 0;">Experimento: Aquecimento e Arrefecimento Gradual</h4>
+                
+                <div style="position: absolute; top: 15px; right: 20px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.4); padding: 6px 12px; border-radius: 6px; z-index: 30; display: flex; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.4);">
+                    <div style="text-align: center; line-height: 1.2;">
+                        <span style="color: #94a3b8; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Temp. Ambiente</span><br>
+                        <span style="color: #bae6fd; font-size: 1.1rem; font-weight: bold;">20 °C</span>
+                    </div>
+                </div>
+
+                <div class="becker">
+                    <div id="agua-exp" class="agua">
+                        <div id="bolhas-exp" class="bolhas"></div>
+                        
+                        <div id="gelo-1" class="gelo-cubo" style="left: 20px;"></div>
+                        <div id="gelo-2" class="gelo-cubo" style="left: 65px;"></div>
+                        <div id="gelo-3" class="gelo-cubo" style="left: 110px;"></div>
+                    </div>
+                    
+                    <div class="thermo-3d">
+                        <div class="vidro-tubo">
+                            <div id="liquido-exp" class="liquido-interno"></div>
+                            <div class="vidro-brilho"></div>
+                        </div>
+                        <div id="bulbo-exp" class="vidro-bulbo"></div>
+                    </div>
+
+                    <div id="chama-exp" class="chama-container">
+                        <div class="chama-out"></div>
+                        <div class="chama-core"></div>
+                    </div>
+
+                    <div style="position: absolute; right: 10px; top: 30px; height: 180px; display: flex; flex-direction: column; justify-content: space-between; color: rgba(255,255,255,0.5); font-size: 0.75rem; font-weight: bold; z-index: 25;">
+                        <span>- 100</span><span>- 75</span><span>- 50</span><span>- 25</span><span>- 0</span>
+                    </div>
+                </div>
+
+                <div class="painel-controles">
+                    <div class="info-display">
+                        Temperatura Atual:<br>
+                        <strong id="temp-exp-display">20.0</strong> <strong>°C</strong>
+                    </div>
+                    <button class="btn-exp btn-fogo" onclick="setModo('aquecer')">🔥 Ligar Fogo</button>
+                    <button class="btn-exp btn-gelo" onclick="setModo('arrefecer')">🧊 Adicionar Gelo</button>
+                    <button class="btn-exp btn-parar" onclick="setModo('ambiente')">🛑 Parar / Ambiente</button>
+                </div>
+            </div>
+            <div class="instrument-item">
+                <img src="imagens/termometro de lamina.jpg" alt="Termômetro Bimetálico">
+                <div>
+                    <strong>Termômetro de Lâmina Bimetálica:</strong> Muito usado em indústrias e fornos. Funciona a partir de duas lâminas de metais diferentes coladas; como se dilatam de forma diferente com o calor, a lâmina curva-se, movendo um ponteiro no mostrador. Existe recursos semelhantes a esse aplicado a sensores. 
+                </div>
+            </div>
+
+<p>Disjuntores termomagnéticos e termostatos bimetálicos são exemplos de dispositivos utilizados atualmente que funcionam através do fenômeno da dilatação térmica dos metais.   </p>
+
+<div class="imagens-lado-a-lado">
+    <div class="foto-item">
+        <img src="imagens/disjuntor_esquema.jpg" alt="Descrição da Imagem 1">
+        <p>Esquema disjuntor</p>
+    </div>
+    <div class="foto-item">
+        <img src="imagens/termostato.jpg" alt="Descrição da Imagem 2">
+        <p>Termostato</p>
+    </div>
+</div>
+
+<p>Disjuntores termomagnéticos são dispotivos de segurança utilizados em residências para controlar a corrente elétrica e evitar acidentes. Já tesmostatos, funcionam como interruptores térmicos que são inseridos em circuitos de eletrodomésticos.  </p>
+
+
+<div class="experimento-container forno-industrial">
+    <h2 class="titulo-simulador">Simulador: Forno Industrial e Sensor Bimetálico</h2>
+    
+    <div class="forno-layout">
+        <div class="camara-forno" id="forno-cor">
+            <div class="label-tech">SISTEMA DE AQUECIMENTO INDUSTRIAL</div>
+            
+            <div class="termometro-corpo">
+                <div class="mostrador-analogo">
+                    <div class="escala-container">
+                        <div class="marcador m0">0</div>
+                        <div class="marcador m100">100</div>
+                        <div class="marcador m200">200</div>
+                        <div class="marcador m300">300</div>
+                    </div>
+                    
+                    <svg viewBox="0 0 100 100" class="espiral-mecanica" id="espiral-svg">
+                        <path d="M 50,50 m 0,-2 a 2,2 0 1,1 0,4 a 6,6 0 1,1 0,-12 a 10,10 0 1,1 0,20 a 14,14 0 1,1 0,-28 a 18,18 0 1,1 0,36" 
+                              fill="none" stroke="#94a3b8" stroke-width="3" />
+                        <path d="M 50,50 m 0,-1.5 a 1.5,1.5 0 1,1 0,3 a 5.5,5.5 0 1,1 0,-11 a 9.5,9.5 0 1,1 0,19 a 13.5,13.5 0 1,1 0,-27 a 17.5,17.5 0 1,1 0,35" 
+                              fill="none" stroke="#fbbf24" stroke-width="2" />
+                    </svg>
+
+                    <div class="ponteiro-red" id="ponteiro"></div>
+                    <div class="pino-central"></div>
+                </div>
+            </div>
+
+            <div class="resistencias-box">
+                <div class="resistencia-filamento" id="res1"></div>
+                <div class="resistencia-filamento" id="res2"></div>
+                <div class="resistencia-filamento" id="res3"></div>
+            </div>
+        </div>
+
+        <div class="painel-operacional">
+            <div class="visor-digital-led">
+                <span class="label-visor">TEMP. ATUAL</span>
+                <div class="valor-led"><span id="temp-forno">20.0</span> °C</div>
+            </div>
+            
+            <button class="btn-power" id="btn-forno" onclick="toggleForno()">
+                LIGAR AQUECEDOR
+            </button>
+        </div>
+    </div>
+</div>
+
+ <div class="instrument-item">
+                <img src="imagens/termometro optico.jpg" alt="Termómetro Óptico">
+                <div>
+                    <strong> Têrmômetro Óptico (Pirômetro):</strong> Mede a temperatura à distância, captando a radiação infravermelha emitida por um objeto. Muito comum na indústria siderúrgica e também em termômetros corporais sem contato. 
+                </div>
+            </div>
+<p>	Algumas faixas da radiação infravermelha são chamadas de 'ondas de calor'. Essa radiação é emitida por todos os corpos que possuem temperatura acima do Zero Absoluto (0 K ou -273,15 °C).
+<p>
+	Toda a faixa do infravermelho transporta energia térmica, mas nós a dividimos em 'subfaixas' porque elas interagem de formas diferentes com a matéria e têm aplicações distintas:
+</p>
+<p>
+- Infravermelho Próximo (NIR): É a faixa mais próxima da luz visível. É muito usada em controles remotos, fibras ópticas e leitores de código de barras. Embora carregue energia, não é a faixa que mais associamos à sensação imediata de 'calor na pele' vindo de objetos comuns.
+</p>
+<p>
+- Infravermelho Médio (MIR): Usado principalmente em sensores de presença e equipamentos de análise química (espectroscopia) para identificar substâncias através da vibração de suas moléculas.
+</p>
+<p>
+- Infravermelho Distante (FIR): Também chamado de infravermelho termal. Esta é a faixa que os objetos em temperatura ambiente (incluindo o corpo humano) emitem com mais intensidade. É a radiação captada por câmeras térmicas e o tipo de calor emitido por saunas e aquecedores cerâmicos.
+</p>
+<p>
+	No simulador, é possível identificar um termômetro recebendo calor (ondas de infravermelho) de um objeto. Se o objeto for aquecido, a emissão aumenta. Quanto maior a radiação recebida pelo termômetro, maior será a temperatura que ele registrará. 
+</p>
+
+<div class="experimento-container termometro-optico-sim">
+    <h2 class="titulo-simulador">Simulador: Pirômetro Óptico (Radiação Térmica)</h2>
+    
+    <div class="optico-layout">
+        <div class="area-emissor">
+            <span class="label-obj" style="display: block; margin-bottom: 10px; font-weight: bold; text-align: center;">OBJETO AQUECIDO</span>
+    <div class="bloco-metal" id="bloco-metal"></div>
+    <div class="chama-queimador" id="chama"></div>
+        </div>
+
+        <div class="area-ondas">
+            <svg viewBox="0 0 100 80" preserveAspectRatio="none" class="svg-ondas" id="ondas-container">
+                <path class="onda onda-1" d="M0,10 Q25,-5 50,10 T100,10" />
+                <path class="onda onda-2" d="M0,25 Q25,10 50,25 T100,25" />
+                <path class="onda onda-3" d="M0,40 Q25,25 50,40 T100,40" />
+                <path class="onda onda-4" d="M0,55 Q25,40 50,55 T100,55" />
+                <path class="onda onda-5" d="M0,70 Q25,55 50,70 T100,70" />
+            </svg>
+        </div>
+
+        <div class="area-receptor">
+            <div class="sensor-optico">
+                <div class="lente-sensor"></div>
+                <div class="corpo-sensor">
+                    <div class="nome-aparelho">PIRÔMETRO ÓPTICO</div>
+                    <div class="visor-sensor">
+                        <span id="temp-optico">20.0</span> °C
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="painel-operacional" style="margin-top: 30px; align-items: center;">
+        <button class="btn-power" id="btn-queimador" onclick="toggleQueimador()">LIGAR MAÇARICO</button>
+    </div>
+</div>
+
+ <div class="instrument-item">
+                <img src="imagens/termometro gas.jpg" alt="Termômetro a Gás">
+                <div>
+                    <strong>Termômetro a Gás (Volume Constante):</strong> É um instrumento muito preciso, usado frequentemente em laboratórios como referência padrão. Mede a temperatura registando a variação da pressão de um gás que está confinado num volume fixo.
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">As Escalas Termométricas e Seus Criadores</h3>
+            <p>Para que um termômetro tenha utilidade, ele precisa de uma "escala" de valores baseada em pontos fixos da natureza (como a fusão do gelo e a ebulição da água).</p>
+            
+            <ul class="info-list">
+                <li><strong>Escala Celsius (°C):</strong> Criada pelo astrónomo sueco <strong>Anders Celsius</strong> em 1742. Ele definiu o ponto de fusão do gelo como 0 °C e o ponto de ebulição da água como 100 °C. Por ter 100 divisões iguais, é chamada de escala centígrada.</li>
+                <li><strong>Escala Fahrenheit (°F):</strong> Criada pelo físico <strong>Daniel Gabriel Fahrenheit</strong> em 1724. Ele usou a temperatura mais fria que conseguiu no laboratório (mistura de água, gelo e sal) como 0 °F e a temperatura do corpo humano perto de 96 °F. A água congela a 32 °F e ferve a 212 °F.</li>
+                <li><strong>Escala Kelvin (K):</strong> Proposta por <strong> William Thomson - Lord Kelvin</strong> em 1848. É uma escala "absoluta", que não depende do comportamento de uma substância específica, mas sim do limite absoluto da natureza.</li>
+            </ul>
+
+<div class="container-criadores">
+    <h2 style="color: #d97706; margin-bottom: 20px;">CRIADORES DAS ESCALAS TÉRMICAS</h2>
+
+    <div class="card-criador-flex">
+        <div class="foto-padrao">
+            <img src="imagens/fahrenheit.jpg" alt="Daniel Fahrenheit">
+        </div>
+        <div class="texto-criador">
+            <h3>Daniel Gabriel Fahrenheit (1686–1736)</h3>
+            <p>Físico e engenheiro alemão. Em 1724, ele propôs a primeira escala de temperatura padronizada e reprodutível, a escala Fahrenheit. Sua inovação foi o desenvolvimento de um termômetro de mercúrio de alta precisão, permitindo medições mais confiáveis. Ele estabeleceu seus pontos de referência usando uma mistura de água, gelo e cloreto de amônio, e a temperatura do corpo humano.</p>
+        </div>
+    </div>
+
+    <div class="card-criador-flex">
+        <div class="foto-cientista">
+            <img src="imagens/celsius.jpg" alt="Anders Celsius">
+        </div>
+        <div class="texto-criador">
+            <h3>Anders Celsius (1701–1744)</h3>
+            <p>Astrônomo sueco, físico e matemático. Ele é conhecido por propor, em 1742, uma escala de temperatura que mais tarde foi renomeada para escala Celsius em sua homenagem. Curiosamente, sua escala original invertia os pontos de ebulição e fusão: ele definiu 0° como o ponto de ebulição e 100° como o ponto de fusão da água ao nível do mar.</p>
+        </div>
+    </div>
+
+    <div class="card-criador-flex">
+        <div class="foto-cientista">
+            <img src="imagens/kelvin.jpg" alt="Lord Kelvin">
+        </div>
+        <div class="texto-criador">
+            <h3>Lord Kelvin (William Thomson) (1824–1907)</h3>
+            <p>William Thomson, mais tarde Lord Kelvin, foi um físico e engenheiro britânico. Ele propôs a escala Kelvin em 1848. Ao contrário das escalas anteriores, a escala Kelvin é uma escala absoluta, começando no zero absoluto, a temperatura teórica onde todo movimento molecular cessa. É a unidade de temperatura fundamental no Sistema Internacional de Unidades (SI).</p>
+        </div>
+    </div>
+</div>
+            <h3 style="margin-top: 2rem;">Conversões entre Escalas (°C, °F e K)</h3>
+            <p>Podemos transitar entre os valores de qualquer uma destas três escalas utilizando a seguinte relação matemática de proporção:</p>
+            <div style="text-align: center; font-size: 1.2rem; margin: 1.5rem 0; overflow-x: auto;">
+                $$\frac{T_C}{5} = \frac{T_F - 32}{9} = \frac{T_K - 273}{5}$$
+            </div>
+            
+            <div class="sim-container" style="background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; margin-top: 2rem; padding: 20px; border-radius: 8px;">
+    <h3 style="color: var(--secondary); text-align: center;">Simulador Comparador de Escalas</h3>
+
+    <div class="scale-box" style="display: flex; justify-content: center; gap: 70px; padding: 40px 0 50px 50px;">
+        <div class="thermometer">
+            <div class="markers">
+                <span class="mark" style="bottom: 100%;">100° —</span>
+                <span class="mark" style="bottom: 73.2%;">0° —</span>
+                <span class="mark" style="bottom: 0%; color: #d35400;">-273° —</span>
+            </div>
+            <div id="mCelsius" class="mercury"></div>
+            <div class="label">°C</div>
+        </div>
+
+        <div class="thermometer">
+            <div class="markers">
+                <span class="mark" style="bottom: 100%;">212° —</span>
+                <span class="mark" style="bottom: 73.2%;">32° —</span>
+                <span class="mark" style="bottom: 0%; color: #d35400;">-459° —</span>
+            </div>
+            <div id="mFahr" class="mercury"></div>
+            <div class="label">°F</div>
+        </div>
+
+        <div class="thermometer">
+            <div class="markers">
+                <span class="mark" style="bottom: 100%;">373K —</span>
+                <span class="mark" style="bottom: 73.2%;">273K —</span>
+                <span class="mark" style="bottom: 0%; color: #d35400;">0K —</span>
+            </div>
+            <div id="mKelvin" class="mercury"></div>
+            <div class="label">K</div>
+        </div>
+    </div>
+
+    <div class="controls" style="margin-top: 20px; text-align: center;">
+        <label style="font-weight: bold; color: #475569;">Temperatura em Celsius: </label>
+        
+<input type="number" id="valcelsius" value="25" step="1" oninput="convertScales(this.value)" style="padding: 8px; width: 110px; border-radius: 4px; border: 1px solid #94a3b8; color: #1e293b;"> °C
+   
+ </div>
+
+    <div style="text-align: center;">
+        <p id="resultsScales" style="font-weight: bold; margin-top: 25px; font-size: 1.2rem; color: #0f172a !important;">25.0 °C = 77.0 °F = 298.2 K</p>
+    </div>
+</div>
+            <h3 style="margin-top: 3rem;">O Zero Absoluto (O Limite da Natureza)</h3>
+            <p>Se arrefecermos um sistema continuamente, as partículas vão perdendo energia cinética e ficando cada vez mais lentas. O limite teórico em que essa agitação se torna a menor possível (quase nula) é o <strong>Zero Absoluto</strong>.</p>
+            
+            <p>Esse estado extremo da matéria corresponde a <strong>0 K</strong>, o que equivale a <strong>-273,15 °C</strong> ou <strong>-459,67 °F</strong>. É por isso que não existem valores negativos na escala Kelvin: não existe movimento menor do que "estar totalmente parado"!</p>
+ 
+<!-- ------início---------SIMULADOR DO ZERO ABSOLUTO ------------------  -->            
+           
+<div class="sim-container" style="margin-top: 2rem;">
+                <h3 style="color: var(--accent);">Simulador: Rumo ao Repouso Total</h3>
+                <canvas id="canvasZero" width="400" height="200"></canvas>
+                <div class="controls">
+                    <button class="quiz-btn" onclick="coolDown()">Arrefecer (-10 K)</button>
+                    <button class="quiz-btn" onclick="resetCool()" style="background: #64748b;">Voltar para 300 K</button>
+                </div>
+                <p style="margin-top: 15px; font-size: 1.1rem;">Temperatura Atual: <strong><span id="currentK">300</span> K</strong></p>
+            </div>
+<!-- ------FIM---------SIMULADOR DO ZERO ABSOLUTO ------------------  -->
+
+<!-- ------início---------SIMULADOR DO ZERO ABSOLUTO NOVO ------------------  -->
+
+<div class="sim-container" style="background: #f1f5f9; padding: 25px; border-radius: 12px; border: 1px solid #cbd5e1; text-align: center;">
+    <h3 style="color: #0891b2;">Simulador: Agitação Molecular e Estados da Matéria</h3>
+    
+    <div style="background: #000; border-radius: 8px; margin: 20px auto; width: 100%; max-width: 500px; overflow: hidden;">
+        <canvas id="canvasMolecules" width="500" height="300"></canvas>
+    </div>
+
+    <div class="controls">
+        <button onclick="changeTemp(-10)" class="btn-cool" style="background-color: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 5px;">Arrefecer (-10 K)</button>
+    
+    <button onclick="changeTemp(10)" class="btn-heat" style="background-color: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 5px;">Aquecer (+10 K)</button>
+    
+    <button onclick="resetTemp()" class="btn-reset" style="background-color: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 5px;">Voltar para 300 K</button>
+    </div>
+
+    <div style="margin-top: 15px;">
+        <span id="tempDisplay" style="font-size: 1.4rem; font-weight: bold; color: #1e293b;">300 K</span>
+        <p id="stateLabel" style="font-style: italic; color: #64748b; margin-top: 5px;">Estado: Líquido</p>
+    </div>
+</div>
+
+<!-- ------FIM---------SIMULADOR DO ZERO ABSOLUTO NOVO ------------------  -->
+            <div class="quiz-container">
+                <h3>Questionário 3 (Escalas e Limites Térmicos)</h3>
+                <div class="question">
+                    <p><strong>Questão 1:</strong> Utilize o Simulador Comparador de Escalas para encontrar a temperatura de ebulição da água (100 °C). Quais são os valores exatos nas escalas Fahrenheit e Kelvin?</p>
+                    <textarea id="q1_m2_ans" rows="2"></textarea>
+                </div>
+                <div class="question">
+                    <p><strong>Questão 2:</strong> Baseado na teoria de Lorde Kelvin e interagindo com o Simulador do Repouso Total, explique fisicamente por que não existem valores negativos na escala Kelvin.</p>
+                    <textarea id="q2_m2_ans" rows="3"></textarea>
+                </div>
+                <button class="quiz-btn" onclick="saveAnswersMod2()">Salvar Respostas do Questionário 3</button>
+                <p id="msg_modulo2" class="status-msg">Respostas do Questionário 3 salvas!</p>
+            </div>
+        </section>
+
+        <section id="professor">
+            <h2>Painel de Acompanhamento (Professor)</h2>
+            <p>Relatório de desempenho e respostas capturadas no navegador local.</p>
+            <div id="reportArea" style="background: #f1f5f9; padding: 1.5rem; border-radius: 8px; margin-top: 1rem; white-space: pre-wrap; border: 1px solid #cbd5e1; font-family: monospace; font-size: 0.9rem; line-height: 1.4;"></div>
+            <button class="quiz-btn" onclick="clearData()" style="background: #ef4444; margin-top: 1rem;">Limpar Base de Dados</button>
+        </section>
+
+    </div>
+</div>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script\" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<script src="js/main.js" defer></script>
+
+<script src="js/professor.js" defer></script>
+
+<script src="js/simuladores/1_equilibrio.js" defer></script>
+<script src="js/simuladores/2_energia.js" defer></script>
+<script src="js/simuladores/3_escalas.js" defer></script>
+<script src="js/simuladores/4_zero_absoluto.js" defer></script>
+<script src="js/simuladores/5_term_liquido.js" defer></script>
+<script src="js/simuladores/6_term_bimetalico.js" defer></script>
+<script src="js/simuladores/7_term_optico.js" defer></script>
+<script src="js/simuladores/8_zero_absoluto_estado_materia.js" defer></script>
+</body>
+</html>
